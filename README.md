@@ -44,3 +44,5 @@ dimensions
 ### 三、贝叶斯优化的流程（基于高斯过程）
 
 #### 3.1 贝叶斯优化流程的伪代码
+
+![aa](https://github.com/Albertsr/Optimization/blob/master/beys.png)
