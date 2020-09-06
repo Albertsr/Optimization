@@ -14,7 +14,9 @@
 
 - **优化目标：** 运用尽可能少的搜索次数找到连续函数的**全局最优解（Global Optimum）** 
 - **搜索空间：** 典型的搜索空间是超矩形（hyper-rectangle)，形如 
+
   ![02search_space](https://github.com/Albertsr/Optimization/blob/master/pic/02search_space.jpg)
+  
 - **更适用于不高于20维的连续搜索空间：** It is best-suited for optimization over continuous domains of less than 20 dimensions  
 - **对随机噪声具备一定的容忍度：** tolerates stochastic noise in function evaluations
 
