@@ -5,42 +5,159 @@
 - Adam / AdaDelta / RMSProp...
 
 
-## 一、贝叶斯优化概述
+### 一、贝叶斯优化概述  
 
-### 1.1 目标函数
-- 运用尽可能少的搜索次数找到一组最佳的超参数`$ x^* $`使得`$f(x)$`最大
-- 适用于不高于20维的连续搜索空间，并对随机噪声具备一定的容忍度
-  - It is best-suited for optimization over continuous domains of less than 20
-dimensions
-  - tolerates stochastic noise in function evaluations
+#### 1.1 优化目标与适用场景
+
+ ```math
+x^* = \underbrace{\arg \max}_{x \in A}\ {f(x)};
+\qquad A: \text{feasible set},\  A \subset R^d
+```
+
+- **优化目标：** 运用尽可能少的搜索次数找到连续函数的**全局最优解（Global Optimum）** 
+- **搜索空间：** 典型的搜索空间是超矩形（hyper-rectangle)，形如 `$\left\{ x \in A \subset R^d : a_i \leq x_i \leq b_i \ , i = 1,2..., d \right\}$`
+- **更适用于不高于20维的连续搜索空间：** It is best-suited for optimization over continuous domains of less than 20 dimensions  
+- **对随机噪声具备一定的容忍度：** tolerates stochastic noise in function evaluations
 
 
-### 1.2 函数`$f(x)$`的特点 
-  - **expensive to evaluate：** 有较高的计算成本；
-  - **black box：** `$f(x)$`没有明确的函数表达式；
-  - **derivative-free：** `$f(x)$`可能无法求导，从而无法运用梯度相关的优化算法；
-  - **连续：** 从而可以用高斯过程等模型来拟合；
+#### 1.2 目标函数`$f(x)$`的特点  
+- **expensive to evaluate：** 有较高的计算成本；
+- **black box：** `$f(x)$`的凹凸性、线性与否等函数性质均未知；
+- **derivative-free：** `$f(x)$`不一定可微，从而无法运用梯度下降法、牛顿法、拟牛顿法等基于梯度的优化算法；
+- **continuous：** 连续型函数，从而可以用高斯过程等模型来拟合；
+- **i.i.d noise：**  默认噪音独立于参数评估与高斯过程，同时方差恒定；[What is the difference between i.i.d noise and white noise? ](https://dsp.stackexchange.com/questions/23881/what-is-the-difference-between-i-i-d-noise-and-white-noise)
+
+#### 1.3 贝叶斯包含两个重要组成部分
+- **Surrogate Model：** 作为先验分布，近似拟合参数点与优化函数之间的函数关系；
+- **Acquisition Function：** 基于后验分布评估可行域内的候选点，并确定下一轮的最佳搜索点；
+
+#### 1.4 总结
+- 贝叶斯优化用于求解黑盒、不可微函数的全局最优化问题；
+  - BayesOpt is designed for black-box derivative free global optimization
+- 贝叶斯优化是“基于序列模型的优化方法”，它根据历史信息迭代模型后，再决定下一次的搜索点；
+  - BayesOpt is a sequential model-based optimization (SMBO) approach
+  - SMBO methods sequentially construct models to approximate the performance of hyperparameters based on historical measurements, and then subsequently choose new hyperparameters to test based on this model
   
 ---
 
-### 二、贝叶斯包含两个重要组成部分
+### 二、Surrogate Model
 
-#### 2.1 surrogate method 
-- **目的：** 作为先验分布函数，用于拟合原函数
-- **类型：**
-  - Gaussian Process (bayesian_optimization)
-  - Tree Parzen Estimator (hyperopt)
-  - SMAC (autosklearn)
-  - Random Forest
+#### 2.1 Surrogate Model在贝叶斯优化中的作用
+- 作为先验分布函数，用于拟合参数点与优化目标之间的函数关系
+- Surrogate Model确定之后，就能生成函数在候选点处取值f(x)的后验分布
+- 例如，当高斯过程作为Surrogate Model时，对于新的候选点`$x_{n+1}$`，基于贝叶斯公式，生成后验概率分布
+```math
+y_{n+1}|x_{n+1}, X_{1:n}, y_{1:n}  \sim N(\mu(x), \sigma^2(x))
+```
 
-#### 2.2 acquisition function
-- **目的：** 基于后验分布函数生成，用于确定下一轮的采样点 
+#### 2.2 常见的Surrogate Model及其对应的Package
+- **Gaussian Process**  
+  - Python Package : [Bayesian Optimization](https://github.com/fmfn/BayesianOptimization)
+  - Published Paper : [Gaussian processes in machine learning [Carl Edward Rasmussen]](https://www.cs.ubc.ca/~hutter/EARG.shtml/earg/papers05/rasmussen_gps_in_ml.pdf)
 
+- **Tree Parzen Estimator**
+  - Python Package : [Hyperopt](https://github.com/hyperopt/hyperopt)
+  - Published Paper : [Algorithms for Hyper-Parameter Optimization [Bergstra et.al.]](https://papers.nips.cc/paper/4443-algorithms-for-hyper-parameter-optimization.pdf)
+  
+- **SMAC**
+  - Python Package : [Auto-Sklearn](https://automl.github.io/auto-sklearn/master/)
+  - Published Paper : [Efficient and Robust Automated Machine Learning [Feurer et al.]](http://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf)
+  
+---
+
+### 三、Acquisition Function
+#### 3.1 Acquisition Function在贝叶斯优化中的作用
+- AF函数是基于后验分布生成的，它在exploring与exploiting之间取得一个平衡，并用于确定下一轮的采样点；
+- 优化问题如下：
+  ```math
+     x_{next} = \underbrace{\arg \max}_{x \in A} \ {AF(x)}
+  ```
+  
+#### 3.2 exploitation与exploration的平衡
+- **exploitation（开发）**
+  - 倾向于选取后验分布中期望均值较大的点，期望均值与模型最终指标成正比；
+  - 对当前已知的、表现良好的点附近进行更细致的寻优；
+  
+- **exploration（探索）**
+  - 倾向于选取后验分布中方差较大的点；
+  - 对未知领域进行更进一步的探索； 
+
+#### 3.3 常见AF函数
+
+##### 1) PI (Probability of Improvement)
+
+```math
+PI(x) = P(f(x) \geq f(x^+)) = \Phi \left(\frac{\mu (x) - f(x^+)}{\sigma(x)}\right)
+```
+- 核心思想——衡量上升的概率
+- 缺点
+  - 过于关注增长的概率，对增长幅度有所忽略；
+  - 更关注exploitation，对exploration缺乏关注
+  
+##### 2) EI (Expected Improvement)  [参考文献：Paper_02]
+- 核心思想——衡量上升的幅度
+```math
+I(x) = \max \lbrace 0, f_{t+1}(x)-f(x^+) \rbrace
+,\  其中\ x = \underbrace{\arg \max}_{x} \ E(I(x) | D_t)
+
+I(x)\text{的概率密度：} 
+\frac{1}{\sqrt{2\pi} \sigma(x)}
+\exp \left(-\frac{(\mu(x)-f(x^+)-I)^2}{2\sigma^2(x)} \right)
+```
+- 数学期望的求解
+```math
+E(I) = \int_{I=0}^{I=\infty} \text{I} \frac{1}{\sqrt{2 \pi} \sigma(x)} 
+\exp (-\frac{(\mu(x)-f(x^+)-I)^2}{2\sigma^2(x)}) dI
+
+= \sigma(x) \left[\frac{\mu(x)-f(x^+)}{\sigma(x)} \Phi(\frac{\mu(x)-f(x^+)}{\sigma(x)}) + \phi \left (\frac{\mu(x)-f(x^+)}{\sigma(x)}\right) \right]
+```
+- EI最终的表达式
+    ```math
+    \text{EI}(x) = \begin{cases} [\mu(x)-f(x^+) ] \cdot \Phi(Z) + \sigma(x) \cdot \phi(Z) & \text{if } \sigma(x)>0   
+    \\ 0 & \text{if } \sigma(x) = 0
+    \end{cases}
+    
+    Z = \frac{\mu(x)-f(x^+)}{\sigma(x)}
+    ```
+##### 3) UCB (upper confidence bound) 
+```math
+UCB = \mu(x) + k\cdot \sigma(x)，k > 0  
+```
+##### 4) entropy search
+- [参考文献：Paper_02]
+##### 5) knowledge gradient
+- [参考文献：Paper_02]
 
 ---
 
-### 三、贝叶斯优化的流程（基于高斯过程）
+### 四、贝叶斯优化的核心思想与流程总结
 
-#### 3.1 贝叶斯优化流程的伪代码
+#### 4.1 核心思想
 
-![aa](https://github.com/Albertsr/Optimization/blob/master/beys.png)
+- 选择替代模型作为先验函数，用于构建参数与优化目标之间的函数关系
+- 先验函数在每一轮搜索之后都会进行迭代，表现为先验函数的参数得到更新
+- 后验分布会随着先验函数的更新而同步发生改变，进一步使得AF函数进行更新
+- 基于AF函数最大化，进行下一轮的最优参数的选取
+
+#### 4.2 贝叶斯优化流程
+![贝叶斯优化流程](791C5AEF1D7449AF8FF4748802806456)
+
+- 基于高斯过程，确定函数`$f$`的先验分布
+- 基于初始空间填充设计，确定n个初始观测点，并计算函数`$f$`在对应观测点上的取值
+- 若寻优的累计次数不超过设定的最大次数阈值N，则重复以下过程：
+  - 基于所有观测点更新`$f$`的后验分布
+  - 基于上述后验分布，更新acquisition function，并将极大值点`$x_n$`作为下一次的观测点
+  - 计算`$y_n = f(x_n)$`，将`$(x_n, y_n)$`添加至已知数据集
+- 上传迭代完成之后，函数取最大值时对应的`$x_n$`即为贝叶斯优化得到的最佳参数
+
+---
+
+#### 参考文献
+- [Paper_01] [A Tutorial on Bayesian Optimization [Peter I. Frazier]](https://arxiv.org/abs/1807.02811)
+
+- [Paper_02] [A Tutorial on Bayesian Optimization of
+Expensive Cost Functions, with Application to
+Active User Modeling and Hierarchical
+Reinforcement Learning [Brochu et.al.]](https://arxiv.org/abs/1012.2599)
+
+---
