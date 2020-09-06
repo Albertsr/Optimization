@@ -57,7 +57,7 @@
 - **Tree Parzen Estimator**
   - Python Package : [Hyperopt](https://github.com/hyperopt/hyperopt)
   - Published Paper : [Algorithms for Hyper-Parameter Optimization [Bergstra et.al.]](https://papers.nips.cc/paper/4443-algorithms-for-hyper-parameter-optimization.pdf)
-  - Code Test : [hyopt.](https://github.com/Albertsr/Optimization/blob/master/Code/hyopt.py)
+  - Code Test : [hyopt.py](https://github.com/Albertsr/Optimization/blob/master/Code/hyopt.py)
   
 - **SMAC**
   - Python Package : [Auto-Sklearn](https://automl.github.io/auto-sklearn/master/)
