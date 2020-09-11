@@ -1,9 +1,15 @@
 # Optimization
 
-- 贝叶斯优化
-- 梯度下降法 / 牛顿法 / 拟牛顿法
-- Adam / AdaDelta / RMSProp...
+- Hyperparameter optimization 
+  - Grid Search / Random Search
+  - Gaussian Process with Expected Improvement
+  - Tree-structured Parzen Estimators (TPE)
+  
+- Gradient-based optimizer
+   - 梯度下降法 / 牛顿法 / 拟牛顿法 / Adam / AdaDelta / RMSProp...
 
+- Loss Function & Regularization
+  
 ---
 
 ### 一、贝叶斯优化
