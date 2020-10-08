@@ -1,15 +1,26 @@
 # Optimization
+- **Author：** MaXiao
+- **E-Mail：** maxiaoscut@aliyun.com
 
-- Hyperparameter optimization 
-  - Grid Search / Random Search
-  - Gaussian Process with Expected Improvement
-  - Tree-structured Parzen Estimators (TPE)
-  
-- Gradient-based optimizer
-   - 梯度下降法 / 牛顿法 / 拟牛顿法 / Adam / AdaDelta / RMSProp...
+---
+## Content outline
+### 1. Bayesian Optimization
+- **surrogate model**
+   - Gaussian Process
+   - Tree-structured Parzen Estimators (TPE)
+- **acquisition function**
+   - PI(Probability of Improvement)
+   - EI(Expected Improvement)
+   - UCB(upper confidence bound)
 
-- Loss Function & Regularization
-  
+### 2. Gradient-based optimizer
+- 梯度下降法 / 牛顿法 / 拟牛顿法 
+- Adam / AdaDelta / RMSProp...
+
+### 3. Loss Function & Regularization
+- Logloss(cross entropy) / HingeLoss / ExpLoss etc.
+- L1 / L2 Regularization
+
 ---
 
 ### 一、贝叶斯优化
@@ -57,17 +68,19 @@
 
 #### 2.2 常见的Surrogate Model及其对应的Package
 - **Gaussian Process**  
+  - Theoretical analysis : [高斯过程-理论概述(by MaXiao)](http://note.youdao.com/noteshare?id=ef4016cbc21eccfaa5f50335ccfdde82&sub=A3C7031CEFD24851ABC694CCFD4738CA)
   - Python Package : [Bayesian Optimization](https://github.com/fmfn/BayesianOptimization)
-  - Published Paper : [Gaussian processes in machine learning [Carl Edward Rasmussen]](https://www.cs.ubc.ca/~hutter/EARG.shtml/earg/papers05/rasmussen_gps_in_ml.pdf)
+  - Recommended Paper : [Gaussian processes in machine learning [Carl Edward Rasmussen]](https://www.cs.ubc.ca/~hutter/EARG.shtml/earg/papers05/rasmussen_gps_in_ml.pdf)
 
 - **Tree Parzen Estimator**
+  - Theoretical analysis : [TPE-理论概述(by MaXiao)](http://note.youdao.com/noteshare?id=4ddafbb0fc8d81df4db86ce10625caf6&sub=F27F9A7BC7B141E4A2C121B534D1E9E5)
   - Python Package : [Hyperopt](https://github.com/hyperopt/hyperopt)
-  - Published Paper : [Algorithms for Hyper-Parameter Optimization [Bergstra et.al.]](https://papers.nips.cc/paper/4443-algorithms-for-hyper-parameter-optimization.pdf)
+  - Recommended Paper : [Algorithms for Hyper-Parameter Optimization [Bergstra et.al.]](https://papers.nips.cc/paper/4443-algorithms-for-hyper-parameter-optimization.pdf)
   - Code Test : [hyopt.py](https://github.com/Albertsr/Optimization/blob/master/Code/hyopt.py)
   
 - **SMAC**
   - Python Package : [Auto-Sklearn](https://automl.github.io/auto-sklearn/master/)
-  - Published Paper : [Efficient and Robust Automated Machine Learning [Feurer et al.]](http://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf)
+  - Recommended Paper : [Efficient and Robust Automated Machine Learning [Feurer et al.]](http://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf)
   
 ---
 
@@ -145,11 +158,24 @@
 ---
 
 #### 参考文献
-- [Paper_01] [A Tutorial on Bayesian Optimization [Peter I. Frazier]](https://arxiv.org/abs/1807.02811)
+- [[01] A Tutorial on Bayesian Optimization [Peter I. Frazier]](https://arxiv.org/abs/1807.02811)
 
-- [Paper_02] [A Tutorial on Bayesian Optimization of
+- [[02] A Tutorial on Bayesian Optimization of
 Expensive Cost Functions, with Application to
 Active User Modeling and Hierarchical
 Reinforcement Learning [Brochu et.al.]](https://arxiv.org/abs/1012.2599)
+
+- [[03] Gaussian Processes in Machine Learning [Carl Edward Rasmussen]](https://www.cs.ubc.ca/~hutter/EARG.shtml/earg/papers05/rasmussen_gps_in_ml.pdf)
+
+- [[04] How priors of initial hyperparameters affect Gaussian
+process regression models [Chen et.al.]](https://arxiv.org/abs/1605.07906)
+
+- [[05] An Intuitive Tutorial to Gaussian Processes Regression [Jie Wang]](https://arxiv.org/abs/2009.10862)
+
+- [[06] Algorithms for Hyper-Parameter Optimization [Bergstra et.al.]](https://www.researchgate.net/profile/Balazs_Kegl/publication/216816964_Algorithms_for_Hyper-Parameter_Optimization/links/02e7e537d951197f0d000000.pdf)
+
+- [[07]  A Comparative Study of Black-box Optimization Algorithms in Deep Neural Networks [Olof Skogby Steinholtz]](http://www.diva-portal.org/smash/get/diva2:1223709/FULLTEXT01.pdf)
+
+- [[08] Model-Based Optimisation with Tree-structured Parzen Estimation for Discrete Event Simulation at Container Terminals [Kastner et.al.]](http://www.asim-fachtagung-spl.de/asim2019/papers/47_Proof_164.pdf)
 
 ---
